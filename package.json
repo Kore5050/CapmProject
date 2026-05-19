@@ -1,0 +1,35 @@
+{
+  "name": "CapmProject",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "^20.0.0 || ^22.0.0 || ^24.0.0"
+  },
+  "dependencies": {
+    "@cap-js/sqlite": "^2.4.0",
+    "@sap/cds": "^9",
+    "@sap/cds-fiori": "^2"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^9"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "postinstall": "node scripts/ensure-native.js",
+    "watch": "node scripts/cds-watch.js"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "impl": "@cap-js/sqlite",
+        "credentials": {
+          "url": ":memory:"
+        }
+      }
+    },
+    "features": {
+      "fiori": true
+    }
+  }
+}
