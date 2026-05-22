@@ -1,11 +1,9 @@
 using { my.catalog as my } from '../db/schema';
 
 service CatalogService {
-    // Draft support — required for Fiori Elements Create / Edit flow
     @odata.draft.enabled
     entity Products as projection on my.Products;
 }
-
 // -------------------------------------------------------------------------
 // Capabilities + explicit UI visibility for Create / Edit / Delete buttons
 // -------------------------------------------------------------------------

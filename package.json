@@ -3,32 +3,28 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "^22.0.0 || ^24.0.0"
+    "node": "^22.0.0 || ^23.0.0 || ^24.0.0"
   },
   "dependencies": {
-    "@sap/cds": "^9",
+    "@cap-js/sqlite": "^2.4.0",
+    "@sap/cds": "^9.9.1",
     "@sap/cds-fiori": "^2",
     "@sap/xssec": "^4",
-    "jwt-decode": "^4"
+    "jwt-decode": "^4",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^2.4.0",
-    "@sap/cds-dk": "^9"
+    "@sap/cds-dk": "^9.9.1"
   },
   "scripts": {
-    "start": "node node_modules/@sap/cds-dk/bin/cds.js serve",
-    "install:deps": "node npm/bin/npm-cli.js install --ignore-scripts",
-    "setup:sqlite": "node scripts/setup-sqlite.js",
-    "watch": "node node_modules/@sap/cds-dk/bin/cds.js watch"
+    "start": "cds serve",
+    "watch": "cds watch"
   },
   "cds": {
     "requires": {
       "db": {
         "kind": "sqlite",
-        "impl": "@cap-js/sqlite",
-        "credentials": {
-          "database": "db.sqlite"
-        }
+        "impl": "sqlite3"
       }
     },
     "features": {

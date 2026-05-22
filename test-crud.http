@@ -1,0 +1,15 @@
+### Read all products
+GET http://localhost:4004/odata/v4/catalog/Products
+
+### Update product 1 — price and stock
+PATCH http://localhost:4004/odata/v4/catalog/Products(1)
+Content-Type: application/json
+
+{
+  "price": 35.99,
+  "stock": 140
+}
+
+### Delete product 5
+DELETE http://localhost:4004/odata/v4/catalog/Products(5)
+Content-Type: application/json
