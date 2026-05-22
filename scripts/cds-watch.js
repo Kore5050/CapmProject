@@ -6,16 +6,11 @@ const path = require('node:path')
 const root = path.join(__dirname, '..')
 const major = Number(process.versions.node.split('.')[0])
 
-if (![20, 22, 24].includes(major)) {
-  console.error('')
-  console.error('Unsupported Node.js version:', process.version)
-  console.error('SAP CAP requires Node.js 20, 22, or 24 LTS.')
-  console.error('Your terminal is using Node 23, which breaks better-sqlite3.')
-  console.error('')
-  console.error('Fix:  nvm use 22   (or install Node 22 LTS)')
-  console.error('Then: npm run watch')
-  console.error('')
-  process.exit(1)
+if (major === 23) {
+  console.warn('')
+  console.warn('Warning: Node.js 23 is not officially supported by SAP CAP.')
+  console.warn('If SQLite fails, switch to Node 22 LTS:  nvm use 22')
+  console.warn('')
 }
 
 require('./ensure-native.js')
