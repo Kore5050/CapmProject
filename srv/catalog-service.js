@@ -1,24 +1,78 @@
-const cds = require('@sap/cds');
+'use strict'
 
-module.exports = class CatalogService extends cds.ApplicationService {
-  init() {
-    const { Products } = this.entities;
+const cds = require('@sap/cds')
+const { validateProduct, normalizeProduct, nextProductId } = require('./lib/product-logic')
 
-    // This code runs BEFORE a new product is created or updated
-    this.before(['CREATE', 'UPDATE'], Products, (req) => {
-      const product = req.data;
-
-      // Rule: Stock cannot be negative
-      if (product.stock < 0) {
-        return req.error(400, `Stock quantity for '${product.title}' cannot be less than 0!`);
-      }
-
-      // Rule: Price must be greater than 0
-      if (product.price <= 0) {
-        return req.error(400, `Price for '${product.title}' must be greater than 0!`);
-      }
-    });
-
-    return super.init();
-  }
+function getProductId(req) {
+  if (req.data?.ID != null) return req.data.ID
+  const key = req.params?.[0]
+  if (key && typeof key === 'object' && key.ID != null) return key.ID
+  if (typeof key === 'number' || typeof key === 'string') return Number(key)
+  return undefined
 }
+
+module.exports = cds.service.impl(async function () {
+  const { Products } = this.entities
+
+  this.before('CREATE', Products, async (req) => {
+    const data = normalizeProduct(req.data)
+    const errors = validateProduct(data)
+    if (errors.length) return req.error(400, errors.join('; '))
+
+    if (!data.ID) {
+      data.ID = await nextProductId(cds.transaction(req))
+    } else if (!Number.isInteger(data.ID) || data.ID <= 0) {
+      return req.error(400, 'ID must be a positive integer')
+    }
+
+    const { SELECT } = cds.ql
+    const existing = await cds.transaction(req).run(
+      SELECT.one.from('my.catalog.Products').where({ ID: data.ID })
+    )
+    if (existing) return req.error(409, `Product ${data.ID} already exists`)
+
+    req.data = data
+  })
+
+  this.before('UPDATE', Products, async (req) => {
+    const id = getProductId(req)
+    if (!id) return req.error(400, 'Product ID is required for update')
+
+    const data = normalizeProduct(req.data)
+    const errors = validateProduct(data, { isUpdate: true })
+    if (errors.length) return req.error(400, errors.join('; '))
+
+    const { SELECT } = cds.ql
+    const existing = await cds.transaction(req).run(
+      SELECT.one.from('my.catalog.Products').where({ ID: id })
+    )
+    if (!existing) return req.error(404, `Product ${id} not found`)
+
+    req.data = { ...data, ID: id }
+  })
+
+  this.before('DELETE', Products, async (req) => {
+    const id = getProductId(req)
+    if (!id) return req.error(400, 'Product ID is required for delete')
+
+    const { SELECT } = cds.ql
+    const existing = await cds.transaction(req).run(
+      SELECT.one.from('my.catalog.Products').where({ ID: id })
+    )
+    if (!existing) return req.error(404, `Product ${id} not found`)
+
+    req.data = { ID: id }
+  })
+
+  this.after('CREATE', Products, (data, req) => {
+    console.error(`[CatalogService] Created product ${data.ID}: ${data.title}`)
+  })
+
+  this.after('UPDATE', Products, (data, req) => {
+    console.error(`[CatalogService] Updated product ${data.ID}: ${data.title}`)
+  })
+
+  this.after('DELETE', Products, (_, req) => {
+    console.error(`[CatalogService] Deleted product ${getProductId(req)}`)
+  })
+})
