@@ -7,14 +7,17 @@
   },
   "dependencies": {
     "@cap-js/sqlite": "^2.4.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@sap/cds": "^9",
-    "@sap/cds-fiori": "^2"
+    "@sap/cds-fiori": "^2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@sap/cds-dk": "^9"
   },
   "scripts": {
     "start": "cds-serve",
+    "mcp": "node server.js",
     "postinstall": "node scripts/ensure-native.js",
     "watch": "node scripts/cds-watch.js"
   },
@@ -24,7 +27,7 @@
         "kind": "sqlite",
         "impl": "@cap-js/sqlite",
         "credentials": {
-          "url": ":memory:"
+          "url": "db.sqlite"
         }
       }
     },

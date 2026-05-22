@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "capm-catalog": {
+      "command": "node",
+      "args": ["server.js"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
